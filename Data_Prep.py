@@ -1,6 +1,6 @@
 # Pokemon 7000 data preparation
 
-# %% Import os & shutil module
+# %% Imports
 import os
 import shutil
 import random
@@ -47,12 +47,12 @@ def create_train_test_datasets(path, split_ratio):
             os.makedirs(os.path.dirname(dst_path), exist_ok=True)
             shutil.copy(src_path, dst_path)
 
-
+#%%
 # Get the current working directory (CWD)
 cwd = "C:/Users/elias/OneDrive/Neural-Final"
-
-enumerate_files(cwd + "/pokemon_7000")
-create_train_test_datasets(cwd + "/pokemon_7000")
+split_ratio = 0.8
+#enumerate_files(cwd + "/pokemon_7000")
+create_train_test_datasets(cwd + "/pokemon_7000", split_ratio)
 
 
 # %%
