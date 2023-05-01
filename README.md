@@ -8,7 +8,7 @@ Eli, Hajin, Meng, Gloria
 
 Thank you to the following medium articles for providing guidance to our project: <br>
 
-Who’s that Pokémon? The EASIEST Image Classification project using Convolutional Neural Networks with Keras by Gabriel Pierobon which can be found at https://medium.com/@gabrielpierobon/whos-that-pok%C3%A9mon-cd02090ab81c <br>
+**Who’s that Pokémon? The EASIEST Image Classification project using Convolutional Neural Networks with Keras** by Gabriel Pierobon which can be found at https://medium.com/@gabrielpierobon/whos-that-pok%C3%A9mon-cd02090ab81c <br>
 
-Multi-Label Classification of Pokemon Types with TensorFlow by Jamshaid Shahir which can be found at https://towardsdatascience.com/multi-label-classification-of-pokemon-types-with-tensorflow-8217a38038a6 <br>
+**Multi-Label Classification of Pokemon Types with TensorFlow** by Jamshaid Shahir which can be found at https://towardsdatascience.com/multi-label-classification-of-pokemon-types-with-tensorflow-8217a38038a6 <br>
 
