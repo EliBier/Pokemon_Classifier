@@ -323,10 +323,29 @@ def show_prediction(name, model):
 
 
 # %%
+def show_prediction_manual(name, types, img_path, model):
+    # Read and prepare image
+    img = tf.keras.preprocessing.image.load_img(
+        img_path, target_size=(IMG_SIZE, IMG_SIZE, CHANNELS)
+    )
+    img = tf.keras.preprocessing.image.img_to_array(img)
+    img = img / 255
+    img = np.expand_dims(img, axis=0)
+
+    # Generate prediction
+    prediction = (model.predict(img) > 0.5).astype("int")
+    prediction = pd.Series(prediction[0])
+    prediction.index = mlb.classes_
+    prediction = prediction[prediction == 1].index.values
+
+    # Predict each Pokemon's type
+    print("\n\n{}\nType\n{}\n\nPrediction\n{}\n".format(name, types, list(prediction)))
+
+
+# %%
 pokemon = ["Horsea", "Poliwrath", "Machamp"]
 
 for poke in pokemon:
     print(poke)
     show_prediction(poke, model)
-# %%
 # %%
