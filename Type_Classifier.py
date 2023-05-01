@@ -14,7 +14,9 @@ import seaborn as sns
 import tensorflow as tf
 from tensorflow import keras
 import tensorflow_hub as hub
+import random
 from keras import regularizers
+from tensorflow.keras.preprocessing import image
 
 from keras.preprocessing import image
 from PIL import Image
@@ -23,6 +25,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.calibration import calibration_curve
 from sklearn.metrics import f1_score
 from keras import layers
+from keras.callbacks import ModelCheckpoint
 
 from utils import *
 import glob
@@ -96,7 +99,6 @@ def getImages(path):
 X_train, X_val, y_train, y_val = getImages(
     "C:/Users/elias/OneDrive/Neural-Final/pokemon_7000"
 )
-
 X_train = pd.concat(
     [X_train],
     ignore_index=True,
@@ -178,7 +180,7 @@ IMG_SIZE = (
     224  # Specify height and width of image to match the input format of the model
 )
 CHANNELS = 3  # Keep RGB color channels to match the input format of the model
-BATCH_SIZE = 256  # Big enough to measure an F1-score
+BATCH_SIZE = 256
 AUTOTUNE = (
     tf.data.experimental.AUTOTUNE
 )  # Adapt preprocessing and prefetching dynamically
@@ -242,10 +244,9 @@ The size of the output layer is then equal to N_LABELS which is the number of ty
 model = tf.keras.Sequential(
     [
         feature_extractor_layer,
-        layers.Dense(
-            1024, activation="relu", kernel_regularizer=regularizers.l1(0.001)
-        ),
-        layers.Dropout(0.5),
+        layers.Dense(1024, activation="relu"),
+        #        layers.Dense(1024, activation="relu", kernel_regularizer=regularizers.l1(0.001)),
+        #        layers.Dropout(0.5),
         layers.Dense(N_LABELS, activation="sigmoid", name="output"),
     ]
 )
@@ -253,12 +254,12 @@ model = tf.keras.Sequential(
 """
 Define learning rate and epochs and then compile and train the model
 """
-LR = 1e-5
-EPOCHS = 60
+LR = 1e-4
+EPOCHS = 80
 
 optimizer = tf.keras.optimizers.Adam(learning_rate=LR)
-loss = tf.keras.losses.CategoricalCrossentropy()
-metrics = [tf.keras.metrics.CategoricalAccuracy()]
+loss = "binary_crossentropy"
+metrics = ["accuracy"]
 
 # Early stopping callback
 early_stop = tf.keras.callbacks.EarlyStopping(
@@ -271,7 +272,61 @@ history = model.fit(
     train_ds,
     epochs=EPOCHS,
     validation_data=create_dataset(X_val, y_val_bin),
+    verbose=1,
     callbacks=[early_stop],
 )
 
+# %%
+"""
+Save weights and biases after training
+"""
+model.save_weights("model_weights_no_dropout_no_regularization.h5")
+
+
+# %%
+# %%
+def show_prediction(name, model):
+    # Get each Pokemon's name and type from the generation 6 games
+    pokeId = poke_df.loc[poke_df["Name"] == name]["No"]
+    types = poke_df.loc[poke_df["Name"] == name]["Types"]
+    # Set the path to the folder that contains images
+    folder_path = os.path.join(
+        "C:/Users/elias/OneDrive/Neural-Final/pokemon_7000", name
+    )
+
+    # Get a list of all the image files in the folder
+    image_files = [
+        os.path.join(folder_path, file)
+        for file in os.listdir(folder_path)
+        if file.endswith(".png")
+    ]
+
+    # Select a random image file from the list
+    img_path = random.choice(image_files)
+    print(img_path)
+    # Read and prepare image
+    img = tf.keras.preprocessing.image.load_img(
+        img_path, target_size=(IMG_SIZE, IMG_SIZE, CHANNELS)
+    )
+    img = tf.keras.preprocessing.image.img_to_array(img)
+    img = img / 255
+    img = np.expand_dims(img, axis=0)
+
+    # Generate prediction
+    prediction = (model.predict(img) > 0.5).astype("int")
+    prediction = pd.Series(prediction[0])
+    prediction.index = mlb.classes_
+    prediction = prediction[prediction == 1].index.values
+
+    # Predict each Pokemon's type
+    print("\n\n{}\nType\n{}\n\nPrediction\n{}\n".format(name, types, list(prediction)))
+
+
+# %%
+pokemon = ["Horsea", "Poliwrath", "Machamp"]
+
+for poke in pokemon:
+    print(poke)
+    show_prediction(poke, model)
+# %%
 # %%
