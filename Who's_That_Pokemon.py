@@ -234,3 +234,15 @@ history = classifier.fit(
     verbose=1,
     validation_data=test_set,
 )
+
+# %%
+model = tf.keras.models.load_model("best_weights.hdf5")
+
+# %%
+# Evaluate the model on the test data
+loss, accuracy = model.evaluate(test_set)
+
+# Print the results
+print(f"Test Loss: {loss:.4f}")
+print(f"Test Accuracy: {accuracy:.4f}")
+# %%
